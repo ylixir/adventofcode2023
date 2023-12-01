@@ -6,7 +6,17 @@ as published by Sam Hocevar. See the COPYING file for more details.
 */
 
 # nix-instantiate --eval 1.nix --arg value 1
+/*
+$ nix-instantiate --eval 1.nix --argstr value "1abc2
+  pqr3stu8vwx
+  a1b2c3d4e5f
+  treb7uchet"
+*/
 
 with builtins;
-let testFunc = n: n+1; in
-{value}: testFunc value
+with (import <nixpkgs> {});
+let
+  inherit (lib.strings) splitString;
+  lines = splitString "\n";
+in
+{value}: head (lines value)
