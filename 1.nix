@@ -17,12 +17,13 @@ let
   inherit (lib.strings) splitString toInt;
   inherit (lib.lists) fold;
   lines = splitString "\n";
+  padWords = replaceStrings ["zero" "one" "two" "three" "four" "five" "six" "seven" "eight" "nine"] ["zzeroo" "oonee" "ttwoo" "tthreee" "ffourr" "ffivee" "ssixx" "ssevenn" "eeightt" "nninee"];
   killWords = replaceStrings ["zero" "one" "two" "three" "four" "five" "six" "seven" "eight" "nine"] ["0" "1" "2" "3" "4" "5" "6" "7" "8" "9"];
   firstDigit = s: head (match "[^0-9]*([0-9]).*" s);
   lastDigit = s: head (match ".*([0-9])[^0-9]*" s);
   # leading zeros can cause issues with "toInt" and "toIntBase10" isn't working
   coord = s: toInt(firstDigit s)*10 + toInt(lastDigit s);
-  coords = s: map (l: coord (killWords l)) (lines s);
+  coords = s: map (l: coord (killWords (padWords l))) (lines s);
   coordSum = s: fold add 0 (coords s);
 in
 {value}: coordSum value
