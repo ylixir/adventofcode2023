@@ -16,7 +16,14 @@ $ nix-instantiate --eval 1.nix --argstr value "1abc2
 with builtins;
 with (import <nixpkgs> {});
 let
-  inherit (lib.strings) splitString;
+  inherit (lib.strings) splitString toInt;
+  inherit (lib.lists) fold;
   lines = splitString "\n";
+  firstDigit = s: head (match "[^0-9]*([0-9]).*" s);
+  lastDigit = s: head (match ".*([0-9])[^0-9]*" s);
+  # leading zeros can cause issues with "toInt" and "toIntBase10" isn't working
+  coord = s: toInt(firstDigit s)*10 + toInt(lastDigit s);
+  coords = s: map coord (lines s);
+  coordSum = s: fold add 0 (coords s);
 in
-{value}: head (lines value)
+{value}: coordSum value
